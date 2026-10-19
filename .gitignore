@@ -9,3 +9,8 @@ models/
 .streamlit/secrets.toml
 /src/cache
 
+*.parquet
+*.pkl
+cache/
+.nyc/
+__pycache__/

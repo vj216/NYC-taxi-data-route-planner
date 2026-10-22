@@ -1,14 +1,13 @@
 # Route Planner: AI-Assisted Route & Travel-Time Predictor
 
-Route Planner combines classical graph search algorithms with machine learning to provide intelligent, traffic-aware travel time estimation across real-world road networks.
+Route Planner combines graph search algorithms with machine learning to provide intelligent, traffic-aware travel time estimation across the NYC road networks.
 
-Unlike traditional routing engines that rely solely on static road limits or generic duration estimates, Route Planner pairs a topological road graph (OpenStreetMap) with a Random Forest regression model trained on 500,000 historical New York City Taxi and Limousine Commission (TLC) trips.
+Route Planner pairs a topological road graph (OpenStreetMap) with a Random Forest regression model trained on 500,000 historical New York City Taxi and Limousine Commission (TLC) trips.
 
 ---
 
-## 🏛 System Architecture
+## System Architecture
 
-The project is structured as a modular, end-to-end pipeline:
 
 ```text
 [NYC TLC Trip Data]               [OpenStreetMap (OSM)]
@@ -25,22 +24,20 @@ The project is structured as a modular, end-to-end pipeline:
                           │
                           ▼
                   [FastAPI REST API]
-                  (POST /route)
                           │
                           ▼
                [Minimal Web Frontend]
-              (HTML / Vanilla JavaScript)
+              
 ```
-
 ---
 
-## 📊 Key Results & Milestones
+## Key Results & Milestones
 
 ### 1. Graph Pathfinding: A* vs. Dijkstra
 - **Road Network**: Central Manhattan network extracted via OSMnx (nodes, edges with meter distances, street names, one-way constraints).
 - **Comparison**: For an identical 1,268.9-meter (~0.79 mile) path:
   - **Dijkstra's Algorithm**: Explored **96 nodes** (1.39 ms).
-  - **A\* Search** (Euclidean distance heuristic): Explored **17 nodes** (0.54 ms).
+  - **A\* Search** : Explored **17 nodes** (0.54 ms).
   - **Result**: A* achieved an **82% reduction in search space** while guaranteeing the exact same optimal distance.
 
 ### 2. Travel-Time Estimation Model (Random Forest)
@@ -53,16 +50,16 @@ The project is structured as a modular, end-to-end pipeline:
 - **Traffic Sensitivity**: For the exact same 0.79-mile route:
   - **Monday 8:00 AM (Rush Hour)**: ~`6.8 minutes`
   - **Sunday 2:00 AM (Late Night)**: ~`4.6 minutes`
-  - Demonstrates a ~48% traffic delay captured directly from empirical city records.
+  - Shows a traffic delay of around 48%, based on actual city traffic data.
 
 ---
 
-## 🖥 Frontend Interface
+## Frontend
 
-The current interface is a lightweight, zero-dependency HTML/JavaScript frontend that communicates directly with the FastAPI backend over REST.
+The current interface is a lightweight, HTML/JavaScript frontend that communicates directly with the FastAPI backend over REST.
 
 - **Inputs**: Departure hour (`0–23`), Departure day (`Monday` through `Sunday`).
-- **Displays**: Instant summary of estimated trip duration (minutes), drivable path distance (miles), and an expandable inspector with full route metrics and node-level coordinates.
+- **Displays**: Shows the estimated trip time in minutes, with an expandable section for detailed route information and the coordinates of each point along the route.
 
 > **Note on Current Limitations & Future Improvements:**
 > - In this initial prototype, pickup (`40.7440, -73.9920`) and dropoff (`40.7536, -73.9832`) coordinates and TLC zone IDs are **hardcoded for testing and baseline validation**.
@@ -73,24 +70,24 @@ The current interface is a lightweight, zero-dependency HTML/JavaScript frontend
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 NYC-taxi-data/
 ├── data/
-│   ├── trips_sample.parquet      # Sampled NYC TLC trip records (git-ignored)
-│   ├── manhattan.graphml         # Downloaded OSMnx street network (git-ignored)
-│   └── travel_time_model.pkl     # Trained Random Forest model (git-ignored)
+│   ├── trips_sample.parquet      # Sampled NYC TLC trip records 
+│   ├── manhattan.graphml         # Downloaded OSMnx street network 
+│   └── travel_time_model.pkl     # Trained Random Forest model
 ├── frontend/
 │   └── index.html                # Minimal web frontend
 ├── src/
 │   ├── downloadmap.py            # OSMnx road graph download script
 │   ├── inspect-graph.py          # Graph topology inspection script
-│   ├── dijkstra.py               # Custom Dijkstra implementation & validation
-│   ├── astar.py                  # Custom A* search implementation
+│   ├── dijkstra.py               # Dijkstra implementation & validation
+│   ├── astar.py                  # A* search implementation
 │   ├── model.py                  # Random Forest training & evaluation
 │   ├── predict-route.py          # Integrated routing + ML estimation script
-│   └── api.py                    # FastAPI server exposing /health and /route
+│   └── api.py                    # FastAPI server 
 ├── .gitignore
 ├── requirements.txt
 └── README.md
@@ -98,12 +95,11 @@ NYC-taxi-data/
 
 ---
 
-## 🚀 How to Run the Project
+## How to Run the Project
 
-### 1. Activate Environment & Install Dependencies
+### 1. Activate Environment
 ```powershell
 .\.nyc\Scripts\activate
-pip install -r requirements.txt
 ```
 
 ### 2. Start the FastAPI Backend
@@ -129,6 +125,6 @@ Open your browser at [http://localhost:5500](http://localhost:5500) to test depa
 - [x] FastAPI REST service (`POST /route`)
 - [x] Minimal working HTML/JS frontend
 - [ ] Replace hardcoded coordinates with editable inputs / landmark dropdowns
-- [ ] Interactive Leaflet/MapLibre map with route polyline rendering
+- [ ] Interactive Leaflet/MapLibre map with route rendering
 - [ ] Dynamic edge-weighting (traffic-aware A* routing)
 - [ ] Multi-city expansion (e.g. Helsinki road network & local transit/traffic estimates)

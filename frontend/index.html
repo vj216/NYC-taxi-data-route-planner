@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Route-planner</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 0 20px;
+            line-height: 1.6;
+            color: #222;
+            background: #f5f7f6;
+        }
+        input, select, button {
+            font: inherit;
+            padding: 8px;
+            margin: 5px 0 15px;
+        }
+        button {cursor: pointer;}
+        pre {
+            background: #e7ede9;
+            padding: 16px;
+            white-space: pre-wrap;
+            overflow-wrap:anywhere;
+        }
+    </style>
+</head>
+<body>
+    <h1>Route-planner</h1>
+    <p>Manhattan route and estimated travel time</p>
+    <p>Pickup: 40.7440, -73.9920<br>
+    Dropoff: 40.7536, -73.9832</p>
+
+    <form id="route-form">
+    <label for="hour">Departure hour (0–23)</label><br>
+    <input id="hour" type="number" min="0" max="23" value="8" required>
+    <br>
+    <label for="day">Departure day</label><br>
+    <select id="day">
+      <option value="0">Monday</option>
+      <option value="1">Tuesday</option>
+      <option value="2">Wednesday</option>
+      <option value="3">Thursday</option>
+      <option value="4">Friday</option>
+      <option value="5">Saturday</option>
+      <option value="6">Sunday</option>
+    </select>
+    <br>
+    <button id="calculate" type="submit">Calculate route</button>
+    </form>
+     <p id="status" role="status"></p>
+  <h2>Result</h2>
+  <p id="summary">No route calculated yet.</p>
+  <details>
+    <summary>Full route results</summary>
+    <pre id="result"></pre>
+  </details>
+
+  <script>
+    const form = document.getElementById("route-form");
+    const button = document.getElementById("calculate");
+    const status = document.getElementById("status");
+    const summary = document.getElementById("summary");
+    const result = document.getElementById("result");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      status.textContent = "Calculating…";
+      summary.textContent = "";
+      result.textContent = "";
+
+      const trip = {
+        start_lat: 40.7440,
+        start_lon: -73.9920,
+        end_lat: 40.7536,
+        end_lon: -73.9832,
+        pickup_hour: Number(document.getElementById("hour").value),
+        pickup_dayofweek: Number(document.getElementById("day").value),
+        pu_location_id: 161,
+        do_location_id: 236
+      };
+
+      try {
+        const response = await fetch("http://localhost:8000/route", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(trip)
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(JSON.stringify(data.detail ?? data));
+        }
+
+        summary.textContent =
+          `Estimated time: ${Number(data.predicted_minutes).toFixed(1)} minutes` +
+          ` | Distance: ${Number(data.distance_miles).toFixed(2)} miles`;
+        result.textContent = JSON.stringify(data, null, 2);
+        status.textContent = "Route calculated.";
+      } catch (error) {
+        status.textContent = "Request failed: " + error.message;
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+
+
+</body>
+</html>

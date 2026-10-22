@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from astar import astar, load_graph, nearest_node
 from dijkstra import dijkstra
 
+
 app = FastAPI(
     title="RouteMind API",
     description="Graph routing with ML travel-time estimation",
@@ -50,6 +51,9 @@ class RouteRequest(BaseModel):
     end_lon: float = Field(default=-73.9832, description="End longitude")
     pickup_hour: int = Field(default=8, ge=0, le=23, description="Hour of day (0-23)")
     pickup_dayofweek: int = Field(default=0, ge=0, le=6, description="Day of week (0=Mon, 6=Sun)")
+    PULocationID: int = Field(default=161, description="TLC Pickup Zone ID")
+    DOLocationID: int = Field(default=236, description="TLC Dropoff Zone ID")
+
 
 
 # --- Endpoints ---
